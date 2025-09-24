@@ -1,0 +1,182 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: retention_postgres
+    environment:
+      POSTGRES_DB: retention_db
+      POSTGRES_USER: retention_user
+      POSTGRES_PASSWORD: retention_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - retention_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retention_user -d retention_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgREST API
+  postgrest:
+    image: postgrest/postgrest:v11.2.0
+    container_name: retention_postgrest
+    environment:
+      PGRST_DB_URI: postgres://retention_user:retention_password@postgres:5432/retention_db
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: retention_user
+      PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
+      PGRST_DEFAULT_RLS: "1"
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # Spring Boot 백엔드
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retention_backend
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/retention_db
+      POSTGRES_USER: retention_user
+      POSTGRES_PASSWORD: retention_password
+      PORT: 8000
+      DEBUG: "False"
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - retention_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Spring Boot 프론트엔드
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: retention_frontend
+    environment:
+      BACKEND_API_URL: http://backend:8000
+      POSTGREST_API_URL: http://postgrest:3000
+      PORT: 3000
+      LOG_LEVEL: INFO
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgrest:
+        condition: service_started
+    networks:
+      - retention_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx 리버스 프록시
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: retention_nginx
+    ports:
+      - "8090:80"
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+      postgrest:
+        condition: service_started
+    networks:
+      - retention_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 머신러닝 서비스 (선택적)
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: retention_ml_service
+    environment:
+      PYTHONPATH: /app
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./ml-service/data:/app/data
+      - ./ml-service/outputs:/app/outputs
+    ports:
+      - "8080:8080"
+    networks:
+      - retention_network
+    restart: unless-stopped
+    profiles:
+      - ml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 데이터 생성기 (선택적)
+  data-generator:
+    build:
+      context: ./data-generator
+      dockerfile: Dockerfile
+    container_name: retention_data_generator
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/retention_db
+      POSTGRES_USER: retention_user
+      POSTGRES_PASSWORD: retention_password
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - retention_network
+    restart: unless-stopped
+    profiles:
+      - data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+
+networks:
+  retention_network:
+    driver: bridge
+
