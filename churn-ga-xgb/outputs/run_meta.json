@@ -1,0 +1,76 @@
+{
+  "args": {
+    "table": "ml_training_data",
+    "target": "everdelinquent",
+    "id_col": null,
+    "date_col": null,
+    "test_size": 0.2,
+    "kfold": 5,
+    "generations": 10,
+    "population": 20,
+    "elitism": 2,
+    "cx_rate": 0.8,
+    "mut_rate": 0.15,
+    "precision_k": 0.1,
+    "outdir": "outputs",
+    "scoring": "pr_auc",
+    "threads": 0
+  },
+  "metrics": {
+    "roc_auc": 0.6082291666666666,
+    "pr_auc": 0.6744010576209528,
+    "brier": 0.2361137028209118,
+    "f1": 0.6639999999999999,
+    "precision": 0.6384615384615384,
+    "recall": 0.6916666666666667,
+    "precision_at_k": 0.75,
+    "recall_at_k": 0.125
+  },
+  "precision_at_k": 0.75,
+  "recall_at_k": 0.125,
+  "best_params": {
+    "max_depth": 3,
+    "learning_rate": 0.10116323451213473,
+    "n_estimators": 387,
+    "min_child_weight": 8,
+    "subsample": 0.9630265895704372,
+    "colsample_bytree": 1.0,
+    "gamma": 2.0519146151781484,
+    "reg_lambda": 16.590888637746204,
+    "reg_alpha": 0.6552097647217688
+  },
+  "artifacts": {
+    "PR Curve": "outputs/pr_curve.png",
+    "ROC Curve": "outputs/roc_curve.png",
+    "Confusion Matrix": "outputs/confusion_matrix.png",
+    "Feature Importance (CSV)": "outputs/feature_importance_xgb.csv",
+    "SHAP Summary": "outputs/shap_summary.png",
+    "SHAP Waterfall(sample0)": "outputs/shap_waterfall_sample0.png",
+    "Model Pipeline": "outputs/model_pipeline.joblib",
+    "GA History": "outputs/ga_history.json"
+  },
+  "report_md": "outputs/report.md",
+  "numeric_features": [
+    "id",
+    "age",
+    "loan_amount",
+    "interest_rate",
+    "loan_term",
+    "monthly_payment",
+    "payment_history_months",
+    "late_payments_3m",
+    "late_payments_6m",
+    "late_payments_12m",
+    "credit_utilization",
+    "debt_to_income_ratio",
+    "employment_length_years",
+    "number_of_accounts",
+    "inquiries_last_6m"
+  ],
+  "categorical_features": [
+    "customer_id",
+    "income_level",
+    "credit_grade",
+    "created_at"
+  ]
+}

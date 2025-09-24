@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: retention_postgres
+    environment:
+      POSTGRES_DB: retention_db
+      POSTGRES_USER: retention_user
+      POSTGRES_PASSWORD: retention_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # PostgREST API
+  postgrest:
+    build:
+      context: ./postgrest
+      dockerfile: Dockerfile
+    container_name: retention_postgrest
+    environment:
+      PGRST_DB_URI: postgres://retention_user:retention_password@postgres:5432/retention_db
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: retention_user
+      PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
+      PGRST_DEFAULT_RLS: "1"
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # FastAPI 백엔드
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retention_backend
+    environment:
+      DATABASE_URL: postgresql://retention_user:retention_password@postgres:5432/retention_db
+      HOST: 0.0.0.0
+      PORT: 8000
+      DEBUG: "False"
+      SECRET_KEY: your-super-secret-key-here
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # Next.js 프론트엔드
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: retention_frontend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+      NEXT_PUBLIC_POSTGREST_URL: http://postgrest:3000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - postgrest
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # Nginx 리버스 프록시
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: retention_nginx
+    ports:
+      - "8090:80"
+    depends_on:
+      - frontend
+      - backend
+      - postgrest
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+  # 머신러닝 (GA-XGBoost Churn Prediction) CPU 2000% 사용
+  ml-service:
+    build:
+      context: ./churn-ga-xgb
+      dockerfile: Dockerfile
+    container_name: retention_ml_service
+    environment:
+      PYTHONPATH: /app
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./churn-ga-xgb/data:/app/data
+      - ./churn-ga-xgb/outputs:/app/outputs
+    networks:
+      - retention_network
+    restart: unless-stopped
+    profiles:
+      - ml
+
+  # 데이터 생성기
+  data-generator:
+    build:
+      context: ./data_generator
+      dockerfile: Dockerfile
+    container_name: retention_data_generator
+    environment:
+      DATABASE_URL: postgresql://retention_user:retention_password@postgres:5432/retention_db
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - postgres
+    networks:
+      - retention_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  retention_network:
+    driver: bridge

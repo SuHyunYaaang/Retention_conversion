@@ -1,0 +1,28 @@
+﻿feature_name,display_name_ko,role,data_type,source_table,description_ko,allowed_values_or_range,unit,example_value,preprocessing,null_handling,leakage_risk,monotonic_constraint,notes
+customer_id,고객 ID,id,string,loans_core,고객(차주)을 식별하는 고유 키,unique,-,C123456,사용 안 함(모델 입력 제외),필수(누락 불가),low,none,조인/집계용으로만 사용
+snapshot_date,스냅샷 일자,date,date,loans_core,관측 기준일(특성 집계/분할 기준),YYYY-MM-DD,-,2024-12-31,"시계열 CV 분할에 사용, 모델 입력 제외",필수(누락 불가),medium,none,학습/검증/테스트 시간 분할 기준
+churn,이탈 라벨,target,binary,labels,관측 윈도우 내 대출 해지/타행 대환/휴면 등 이탈 여부(1=이탈),"{0,1}",-,0,목표 변수,필수(누락 불가),-,none,정의 고정: 예측 기준일 이후 60~90일 내 이벤트
+credit_score,신용 점수,feature,numeric,borrower,대출 심사 시점 또는 최신 신용 점수,300–900,score,760,표준화(스케일링),중앙값 대치,low,decreasing,점수↑ → 이탈위험↓(단조 감소 권장)
+first_time_homebuyer_flag,생애 첫 주택구입 여부,feature,categorical,borrower,첫 주택 구입자인지 여부,"{Y,N}",-,N,원-핫 인코딩,결측은 별도 카테고리,low,none,-
+dti,부채상환비율(DTI),feature,numeric,borrower,월부채/월소득 비율(%),0–70(권장 클린 범위),percent,36.5,winsorize(1/99백분위) 후 표준화,중앙값 대치,medium,increasing,DTI↑ → 위험↑(단조 증가 권장)
+upb_orig,원금 미상환 잔액(원점시),feature,numeric,loan_orig,대출 실행 시점의 원금 미상환 잔액(Original UPB),>=0,currency,250000,로그 변환+표준화,0 대치/중앙값,low,none,스케일 큰 변수: 로그 권장
+ltv_orig,담보인정비율(LTV),feature,numeric,loan_orig,대출금/감정가 비율(%),0–120,percent,80,표준화,중앙값 대치,medium,increasing,LTV↑ → 위험↑(단조 증가 권장)
+ocl tv,총 담보인정비율(OCLTV),feature,numeric,loan_orig,모든 담보대출 합계/감정가 비율(%),0–150,percent,85,표준화,중앙값 대치,medium,increasing,철자 주의: OCLTV
+orig_interest_rate,대출 개시 금리,feature,numeric,loan_orig,실행 시점 고정/변동 금리(%),0–20,percent,5.25,표준화,중앙값 대치,low,increasing,금리↑ → 재대환 유인↑(위험↑ 가정)
+loan_purpose,대출 목적,feature,categorical,loan_orig,매입/대환/현금화 등 목적,"{purchase, refinance, cash_out, other}",-,purchase,원-핫 인코딩,결측 별도 카테고리,low,none,정책상 일부 범주 제외 가능
+occupancy_type,거주 형태,feature,categorical,property,자가거주/세컨드홈/임대,"{owner, second, investor}",-,owner,원-핫 인코딩,결측 별도 카테고리,medium,none,투자용은 위험↑ 가능
+property_type,부동산 유형,feature,categorical,property,"SFH, Condo, PUD 등","{sfh, condo, pud, multi, other}",-,sfh,원-핫 인코딩,결측 별도 카테고리,low,none,-
+num_units,유닛 수,feature,numeric,property,부동산 내 독립 거주 유닛 개수,1–4,count,1,표준화,중앙값 대치,low,none,멀티유닛일수록 리스크 상이
+msa,광역통계지역(MSA),feature,categorical,geo,미국 통계청 정의의 도시권 코드,정의 목록,-,31080,빈도 인코딩/타깃 인코딩,결측 별도,low,none,카디널리티 높음 → 빈도 인코딩 권장
+property_state,소재 주(State),feature,categorical,geo,부동산 소재 주,US state codes,-,CA,원-핫/빈도 인코딩,결측 별도,low,none,-
+seller_name,판매자,feature,categorical,servicing,대출 매각 시 판매자명,상위 N개 + 기타,-,Wells Fargo,상위 N개 외 기타 묶기,결측 기타,medium,none,기관 고정효과
+servicer_name,서비서,feature,categorical,servicing,대출 서비스 제공자명,상위 N개 + 기타,-,Mr. Cooper,상위 N개 외 기타 묶기,결측 기타,medium,none,운영품질 차이 반영
+ever_delinquent_flag,연체 이력 여부,feature,binary,performance,과거 한 번이라도 30+일 연체,"{0,1}",-,0,그대로 사용,결측=0(보수적),high,increasing,라벨 시점 이전 이력만 사용(누수 주의)
+months_delinquent_lifetime,누적 연체 개월수,feature,numeric,performance,라벨 시점 이전 누적 연체 월수,0–120,months,0,표준화,결측=0,high,increasing,누수 방지 규칙 필수
+first_payment_date,첫 상환일,feature,date,loan_orig,첫 납입 예정일,YYYY-MM,-,2019-07,연/월로 파생(경과개월),결측 허용,medium,none,경과개월=스냅샷-첫상환
+maturity_date,만기일,feature,date,loan_orig,대출 만기 예정일,YYYY-MM,-,2049-06,잔여개월=만기-스냅샷,결측 허용,medium,decreasing,잔여개월↑ → 위험↓ 가정
+current_balance,현재 잔액,feature,numeric,servicing,스냅샷 시점 미상환 원금,>=0,currency,240000,로그 변환+표준화,0 대치/중앙값,low,none,-
+balance_trend_3m,3개월 잔액 추세기울기,feature,numeric,servicing,최근 3개월 잔액 선형기울기,실수,currency/month,-1200,표준화,중앙값 대치,medium,increasing,감소(음수)면 이탈↓ 가정일 수 있음
+tx_count_1m,1개월 거래 횟수,feature,numeric,transactions,지난 30일 입출금/거래 건수,0–999,count,18,표준화,중앙값 대치,low,decreasing,활동↑ → 이탈↓ 경향
+tx_amt_1m,1개월 거래 금액 합계,feature,numeric,transactions,지난 30일 총 거래 금액,>=0,currency,5400,로그 변환+표준화,0 대치/중앙값,low,decreasing,-
+login_freq_1m,1개월 로그인 빈도,feature,numeric,digital,지난 30일 모바일/웹 접속 횟수,0–500,count,9,표준화,중앙값 대치,low,decreasing,디지털 접속↑ → 이탈↓

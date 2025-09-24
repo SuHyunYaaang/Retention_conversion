@@ -1,0 +1,152 @@
+[
+  {
+    "gen": 0,
+    "best_score": 0.7406344403509677,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 4,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.6246461145744375,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 15.111022770860973,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 1,
+    "best_score": 0.7406344403509677,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 4,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.6246461145744375,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 15.111022770860973,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 2,
+    "best_score": 0.7406344403509677,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 4,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.6246461145744375,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 15.111022770860973,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 3,
+    "best_score": 0.7406344403509677,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 4,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.6246461145744375,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 15.111022770860973,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 4,
+    "best_score": 0.7416656285153821,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 387,
+      "min_child_weight": 9,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.8600408118034067,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 16.590888637746204,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 5,
+    "best_score": 0.7416656285153821,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 387,
+      "min_child_weight": 9,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.8600408118034067,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 16.590888637746204,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 6,
+    "best_score": 0.7417299614101006,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 8,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.892753567902488,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 16.590888637746204,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 7,
+    "best_score": 0.7429887617698914,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 387,
+      "min_child_weight": 9,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.8600408118034067,
+      "gamma": 2.3531532198978895,
+      "reg_lambda": 16.590888637746204,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 8,
+    "best_score": 0.7431091175009514,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.10116323451213473,
+      "n_estimators": 295,
+      "min_child_weight": 8,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.8600408118034067,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 14.860810185048217,
+      "reg_alpha": 1.1439908274581123
+    }
+  },
+  {
+    "gen": 9,
+    "best_score": 0.7445289658449804,
+    "best_params": {
+      "max_depth": 3,
+      "learning_rate": 0.08366398784810278,
+      "n_estimators": 201,
+      "min_child_weight": 9,
+      "subsample": 0.9630265895704372,
+      "colsample_bytree": 0.892753567902488,
+      "gamma": 2.0519146151781484,
+      "reg_lambda": 16.590888637746204,
+      "reg_alpha": 1.1439908274581123
+    }
+  }
+]

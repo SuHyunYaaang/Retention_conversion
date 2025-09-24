@@ -1,0 +1,3 @@
+using database : postgresql
+server : fastapi
+frontend : nextjs (Page Router)

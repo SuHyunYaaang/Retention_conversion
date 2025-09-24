@@ -1,0 +1,48 @@
+# data_schema.yaml
+target: churn
+id: customer_id
+date: snapshot_date
+split:
+  method: time_based  # or stratified
+  test_size: 0.2
+  cv:
+    type: rolling_origin
+    folds: 5
+features:
+  numeric:
+    - credit_score
+    - dti
+    - upb_orig
+    - ltv_orig
+    - ocl tv
+    - orig_interest_rate
+    - num_units
+    - months_delinquent_lifetime
+    - current_balance
+    - balance_trend_3m
+    - tx_count_1m
+    - tx_amt_1m
+    - login_freq_1m
+  categorical:
+    - first_time_homebuyer_flag
+    - loan_purpose
+    - occupancy_type
+    - property_type
+    - msa
+    - property_state
+    - seller_name
+    - servicer_name
+preprocessing:
+  numeric:
+    imputer: median
+    scaler: standard
+  categorical:
+    imputer: most_frequent
+    encoder: onehot  # high-cardinality -> frequency/target encoding
+constraints:
+  monotonic:
+    increasing: [dti, ltv_orig, orig_interest_rate, months_delinquent_lifetime, ever_delinquent_flag]
+    decreasing: [credit_score, maturity_date]
+leakage_rules:
+  - use only history prior to snapshot_date
+  - exclude post-label events

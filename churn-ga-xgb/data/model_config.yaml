@@ -1,0 +1,27 @@
+# model_config.yaml
+model: xgboost
+objective: binary:logistic
+eval_metric: logloss
+tree_method: hist
+random_state: 42
+hyperparams_search:
+  method: genetic
+  population: 36
+  generations: 20
+  crossover_rate: 0.8
+  mutation_rate: 0.15
+  cv_folds: 5
+  scoring: pr_auc
+search_space:
+  max_depth: [3, 10]
+  learning_rate: [0.01, 0.3]
+  n_estimators: [200, 1200]
+  min_child_weight: [1, 10]
+  subsample: [0.6, 1.0]
+  colsample_bytree: [0.5, 1.0]
+  gamma: [0.0, 5.0]
+  reg_lambda: [0.0, 20.0]
+  reg_alpha: [0.0, 5.0]
+metrics_reporting:
+  primary: pr_auc
+  secondary: [f1, roc_auc, brier, precision_at_10, recall_at_10]
